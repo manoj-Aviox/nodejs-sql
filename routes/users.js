@@ -15,16 +15,28 @@ router.get("/:userId", (req, res) => {
   var sql = `SELECT * FROM users WHERE id=${req.params.userId}`;
   db.query(sql, function (err, result) {
     if (err) throw err;
-    res.json({ data: result });
+    if (!result.length == 0) {
+      res.json({ data: result });
+    } else {
+      res.json({ message: "user doesn't exist", data: result });
+    }
   });
 });
 
 // user delete
 router.delete("/:userId", (req, res) => {
   var sql = `DELETE FROM users WHERE id=${req.params.userId}`;
-  db.query(sql, function (err, result) {
+  var sql1 = `SELECT * FROM users WHERE id=${req.params.userId}`;
+  db.query(sql1, function (err, result) {
     if (err) throw err;
-    res.json({ message: "user deleted!" });
+    if (!result.length == 0) {
+      db.query(sql, function (err) {
+        if (err) throw err;
+        res.json({ message: "user deleted!" });
+      });
+    } else {
+      res.json({ message: "user doesn't exist" });
+    }
   });
 });
 
